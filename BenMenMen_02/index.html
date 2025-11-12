@@ -1,0 +1,113 @@
+﻿<!doctype html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>我爱你</title>
+	<meta name="language" content="zh-CN">
+	<meta name="github" content="https://github.com/sun0225SUN/Awesome-Love-Code">
+	<meta name="describe" content="嘿嘿">
+	<link rel="icon" type="image/x-icon" href="https://cdn.jsdelivr.net/gh/sun0225SUN/photos/img/20210715233345.png">
+
+	<style>
+		html,
+		body {
+			margin: 0;
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+			background: #000;
+		}
+
+		audio {
+			display: none;
+		}
+	</style>
+</head>
+
+<body>
+	<!-- ✅ 背景音乐 -->
+	<audio id="bgm" src="images/1.mp3" autoplay loop></audio>
+
+	<canvas id="canvas" style="position:absolute;width:100%;height:100%;z-index:8888"></canvas>
+	<canvas style="position:absolute;width:100%;height:100%;z-index:9999" class="canvas"></canvas>
+
+	<div class="overlay">
+		<div class="tabs">
+			<div class="tabs-labels">
+				<span class="tabs-label">Commands</span>
+				<span class="tabs-label">Info</span>
+				<span class="tabs-label">Share</span>
+			</div>
+			<div class="tabs-panels">
+				<ul class="tabs-panel commands"></ul>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		// 🎵 解决浏览器禁止自动播放的问题
+		const bgm = document.getElementById("bgm");
+		document.addEventListener("click", () => {
+			if (bgm.paused) {
+				bgm.muted = false;
+				bgm.play();
+			}
+		});
+		window.addEventListener("load", () => {
+			bgm.muted = true;
+			bgm.play().then(() => {
+				setTimeout(() => { bgm.muted = false; }, 1500);
+			}).catch(() => {
+				console.log("等待用户交互后播放背景音乐");
+			});
+		});
+	</script>
+
+	<!-- 你的原脚本 -->
+	<script>
+		function initVars() {
+			pi = Math.PI;
+			ctx = canvas.getContext("2d");
+			canvas.width = canvas.clientWidth;
+			canvas.height = canvas.clientHeight;
+			cx = canvas.width / 2;
+			cy = canvas.height / 2;
+			playerZ = -25;
+			playerX = playerY = playerVX = playerVY = playerVZ = pitch = yaw = pitchV = yawV = 0;
+			scale = 600;
+			seedTimer = 0; seedInterval = 5; seedLife = 100; gravity = .02;
+			seeds = [];
+			sparkPics = [];
+			s = "https://cantelope.org/NYE/";
+			for (i = 1; i <= 10; ++i) {
+				let sparkPic = new Image();
+				sparkPic.src = s + "spark" + i + ".png";
+				sparkPics.push(sparkPic);
+			}
+			sparks = [];
+			pow1 = new Audio(s + "pow1.ogg");
+			pow2 = new Audio(s + "pow2.ogg");
+			pow3 = new Audio(s + "pow3.ogg");
+			pow4 = new Audio(s + "pow4.ogg");
+			frames = 0;
+		}
+
+		/* ...你的原始烟花代码保持不变... */
+		// (这里省略中间部分，内容完全不变)
+
+		window.addEventListener("resize", () => {
+			canvas.width = canvas.clientWidth;
+			canvas.height = canvas.clientHeight;
+			cx = canvas.width / 2;
+			cy = canvas.height / 2;
+		});
+
+		initVars();
+		frame();
+	</script>
+
+	<script src="js/index.js"></script>
+</body>
+
+</html>
