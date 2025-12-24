@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>By王萍宝宝-圣诞树</title>
 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
     <style>
         html, body {
             margin: 0;
@@ -20,10 +22,7 @@
         #video1 {
             width: 100%;
             height: 100%;
-        }
-
-        .hidden {
-            display: none;
+            object-fit: cover;
         }
     </style>
 </head>
@@ -31,20 +30,27 @@
 <body>
 
     <div id="main">
-        <video id="video1" muted autoplay loop src="1.mp4"></video>
+        <video id="video1" muted autoplay loop playsinline webkit-playsinline src="1.mp4"></video>
     </div>
 
     <!-- 🎵 背景音乐 -->
-    <audio id="bgm" src="1.mp3" loop></audio>
+    <audio id="bgm" src="1.mp3" loop preload="auto"></audio>
 
 </body>
 
 <script type="text/javascript">
-    // 页面首次点击后播放背景音乐（兼容浏览器自动播放策略）
-    document.addEventListener('click', function () {
+
+    function playBgm() {
         var bgm = document.getElementById('bgm');
-        bgm.play();
-    }, { once: true });
+        bgm.play().catch(function(){});
+        document.removeEventListener('touchstart', playBgm);
+        document.removeEventListener('click', playBgm);
+    }
+
+    // 手机端 + 桌面端 双兼容
+    document.addEventListener('touchstart', playBgm, false);
+    document.addEventListener('click', playBgm, false);
+
 </script>
 
 </html>
