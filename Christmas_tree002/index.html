@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>By王萍宝宝-圣诞树</title>
+
+    <style>
+        html, body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #main {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        #video1 {
+            width: 100%;
+            height: 100%;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="main">
+        <video id="video1" muted autoplay loop src="1.mp4"></video>
+    </div>
+
+    <!-- 🎵 背景音乐 -->
+    <audio id="bgm" src="1.mp3" loop></audio>
+
+</body>
+
+<script type="text/javascript">
+    // 页面首次点击后播放背景音乐（兼容浏览器自动播放策略）
+    document.addEventListener('click', function () {
+        var bgm = document.getElementById('bgm');
+        bgm.play();
+    }, { once: true });
+</script>
+
+</html>
