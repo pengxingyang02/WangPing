@@ -1,28 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <title>By王萍宝宝-圣诞树</title>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <!-- 关键：移动端视口 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, 
+        maximum-scale=1.0, user-scalable=no">
 
     <style>
         html, body {
             margin: 0;
+            padding: 0;
             width: 100%;
             height: 100%;
+            overflow: hidden;
+            background: #000;
         }
 
         #main {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
+            width: 100%;
+            height: 100%;
         }
 
         #video1 {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: cover; /* 核心：自适应屏幕 */
         }
     </style>
 </head>
@@ -30,27 +37,31 @@
 <body>
 
     <div id="main">
-        <video id="video1" muted autoplay loop playsinline webkit-playsinline src="1.mp4"></video>
+        <video
+            id="video1"
+            src="1.mp4"
+            autoplay
+            loop
+            muted
+            playsinline
+            webkit-playsinline
+        ></video>
     </div>
 
     <!-- 🎵 背景音乐 -->
     <audio id="bgm" src="1.mp3" loop preload="auto"></audio>
 
-</body>
-
-<script type="text/javascript">
-
-    function playBgm() {
+<script>
+    // 首次触摸页面后，播放背景音乐（兼容微信 / iOS / Android）
+    function playMusic() {
         var bgm = document.getElementById('bgm');
-        bgm.play().catch(function(){});
-        document.removeEventListener('touchstart', playBgm);
-        document.removeEventListener('click', playBgm);
+        bgm.play();
+        document.removeEventListener('touchstart', playMusic);
     }
 
-    // 手机端 + 桌面端 双兼容
-    document.addEventListener('touchstart', playBgm, false);
-    document.addEventListener('click', playBgm, false);
-
+    document.addEventListener('touchstart', playMusic);
+    document.addEventListener('click', playMusic);
 </script>
 
+</body>
 </html>
