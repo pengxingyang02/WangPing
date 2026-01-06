@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>李依然宝宝</title>
+    <meta name="language" content="zh-CN">
+    <meta name="title" content="李依然宝宝">
+    <meta name="describe" content="嘿嘿嘿~">
+    <link rel="icon" type="image/x-icon" href="https://cdn.jsdelivr.net/gh/sun0225SUN/photos/img/20210715233345.png">
+    <link rel="stylesheet" href="css/love.css">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #fff;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        /* 播放按钮 */
+        #musicBtn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 182, 193, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255,105,180,0.8);
+            transition: all 0.3s;
+            z-index: 999;
+        }
+        #musicBtn:hover {
+            transform: scale(1.1);
+        }
+        #musicBtn img {
+            width: 40px;
+            height: 40px;
+            animation: spin 3s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 背景音乐 -->
+    <audio id="audios" autoplay loop preload="auto" muted>
+        <source src="./MP3/1.mp3" type="audio/mpeg">
+        您的浏览器不支持 audio 标签。
+    </audio>
+
+    <!-- 页面主体 -->
+    <div class="container" onselectstart="return false;" unselectable="on" style="-moz-user-select:none;">
+        <div class="body_left">
+            <img src="images/biubiubiu.gif" alt="" ondragstart='return false;'>
+        </div>
+
+        <div class="body_center love">
+            <div class="block">
+                <div class="div1"></div>
+                <div class="div2"></div>
+                <div class="div3"></div>
+                <div class="div4"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="border">
+            <div class="border-top"></div>
+            <div class="border-bottom"></div>
+        </div>
+    </div>
+
+    <!-- 音乐按钮 -->
+    <div id="musicBtn" title="点击播放音乐">
+        <img src="images/music_note_big.png" alt="音乐">
+    </div>
+
+    <script src="js/love.js"></script>
+    <script>
+        const audio = document.getElementById('audios');
+        const btn = document.getElementById('musicBtn');
+        let isPlaying = false;
+
+        // 页面加载后尝试播放
+        window.addEventListener('load', () => {
+            audio.play().then(() => {
+                isPlaying = true;
+                audio.muted = false;
+            }).catch(() => {
+                console.log('自动播放被阻止，等待用户点击');
+            });
+        });
+
+        // 点击按钮播放或暂停
+        btn.addEventListener('click', () => {
+            if (isPlaying) {
+                audio.pause();
+                isPlaying = false;
+                btn.style.opacity = "0.6";
+            } else {
+                audio.muted = false;
+                audio.play().then(() => {
+                    isPlaying = true;
+                    btn.style.opacity = "1";
+                }).catch(err => console.log('播放失败：', err));
+            }
+        });
+    </script>
+
+</body>
+</html>
