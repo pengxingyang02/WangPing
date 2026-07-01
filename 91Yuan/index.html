@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"/>
+<title>91官方网站</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ===== CSS Variables ===== */
+:root{
+  --bg:       #06060f;
+  --bg2:      #0d0d1c;
+  --surface:  rgba(255,255,255,0.04);
+  --border:   rgba(255,255,255,0.08);
+  --teal:     #00d4c8;
+  --teal2:    #00a89f;
+  --coral:    #ff4757;
+  --coral2:   #cc2f3f;
+  --text:     #f0f0f8;
+  --muted:    rgba(200,200,220,0.45);
+  --glow-t:   rgba(0,212,200,0.25);
+  --glow-c:   rgba(255,71,87,0.25);
+  --ff-head:  'Syne', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --ff-body:  'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --radius:   16px;
+  --radius-sm:10px;
+}
+
+/* ===== Reset ===== */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--ff-body)}
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:99px}
+
+/* ===== Particle Canvas ===== */
+#bg-canvas{
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  z-index:0;pointer-events:none;
+}
+
+/* ===== Noise overlay for texture ===== */
+body::before{
+  content:'';position:fixed;inset:0;z-index:1;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity:0.4;
+}
+
+/* ===== Age Modal ===== */
+#age-modal{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  z-index:9000;
+  background:radial-gradient(ellipse at 50% 50%, rgba(0,212,200,0.06) 0%, rgba(6,6,15,0.97) 70%);
+  backdrop-filter:blur(2px);
+  animation:fadeIn 0.5s ease;
+}
+
+.modal-box{
+  position:relative;
+  width:92%;max-width:460px;
+  background:rgba(13,13,28,0.9);
+  border:1px solid rgba(0,212,200,0.18);
+  border-radius:24px;
+  padding:40px 36px;
+  text-align:center;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.04),
+    0 30px 80px rgba(0,0,0,0.8),
+    0 0 60px rgba(0,212,200,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+  animation:slideUp 0.5s cubic-bezier(0.17,0.67,0.35,1.2);
+  overflow:hidden;
+}
+
+/* Gradient top accent line */
+.modal-box::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--teal),transparent);
+}
+
+/* Ambient glow behind modal */
+.modal-box::after{
+  content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);
+  width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(0,212,200,0.08) 0%,transparent 70%);
+  pointer-events:none;
+}
+
+.modal-icon{
+  width:56px;height:56px;
+  border-radius:50%;
+  background:linear-gradient(135deg,rgba(0,212,200,0.15),rgba(255,71,87,0.1));
+  border:1px solid rgba(0,212,200,0.25);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;
+  font-size:22px;
+}
+
+.modal-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,rgba(255,71,87,0.2),rgba(255,71,87,0.08));
+  border:1px solid rgba(255,71,87,0.3);
+  color:var(--coral);
+  font-size:10px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;
+  padding:5px 14px;border-radius:99px;
+  margin-bottom:18px;
+  font-family:var(--ff-head);
+}
+
+.modal-box h2{
+  font-family:var(--ff-head);
+  font-size:28px;font-weight:800;
+  color:#fff;
+  margin-bottom:14px;
+  letter-spacing:-0.01em;
+  background:linear-gradient(135deg,#fff 60%,rgba(0,212,200,0.8));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+.modal-box .sub{
+  font-size:13.5px;color:var(--muted);
+  line-height:1.85;margin-bottom:28px;
+  font-family:var(--ff-body);
+}
+.modal-box .sub strong{
+  color:var(--teal);font-weight:500;
+}
+
+.modal-actions{
+  display:flex;gap:12px;justify-content:center;flex-wrap:wrap;
+}
+
+.btn{
+  flex:1;max-width:170px;min-width:130px;
+  padding:14px 0;border:none;border-radius:12px;
+  font-size:14px;font-weight:700;letter-spacing:0.03em;
+  font-family:var(--ff-head);
+  cursor:pointer;position:relative;z-index:1;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform 0.15s,box-shadow 0.15s,opacity 0.15s;
+  overflow:hidden;
+}
+.btn::after{
+  content:'';position:absolute;inset:0;
+  background:rgba(255,255,255,0);
+  transition:background 0.15s;
+}
+.btn:hover::after{background:rgba(255,255,255,0.08)}
+.btn:active{transform:scale(0.96)}
+
+.btn-yes{
+  background:linear-gradient(135deg,var(--teal),var(--teal2));
+  color:#000;
+  box-shadow:0 4px 20px rgba(0,212,200,0.3);
+}
+.btn-yes:hover{box-shadow:0 6px 28px rgba(0,212,200,0.45)}
+
+.btn-no{
+  background:transparent;
+  border:1px solid rgba(255,71,87,0.4);
+  color:var(--coral);
+}
+.btn-no:hover{border-color:var(--coral);background:rgba(255,71,87,0.08)}
+
+.modal-note{
+  margin-top:22px;font-size:10px;
+  color:rgba(200,200,220,0.2);
+  letter-spacing:0.03em;
+  font-family:var(--ff-body);
+}
+
+/* ===== Loader ===== */
+#loader{
+  position:fixed;inset:0;display:none;flex-direction:column;
+  align-items:center;justify-content:center;gap:20px;
+  z-index:8000;background:var(--bg);
+}
+
+.loader-inner{display:flex;flex-direction:column;align-items:center;gap:16px}
+
+.ring-wrap{position:relative;width:54px;height:54px}
+.ring{
+  position:absolute;inset:0;
+  border-radius:50%;
+  border:2px solid transparent;
+  border-top-color:var(--teal);
+  animation:spin 1s linear infinite;
+}
+.ring-outer{
+  border-width:1px;
+  border-top-color:rgba(255,71,87,0.5);
+  animation-duration:1.5s;animation-direction:reverse;
+}
+.ring-dot{
+  position:absolute;top:50%;left:50%;
+  width:6px;height:6px;border-radius:50%;margin:-3px;
+  background:var(--teal);
+  box-shadow:0 0 10px var(--teal);
+}
+
+#loader-txt{
+  font-family:var(--ff-head);
+  font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--muted);
+}
+
+/* ===== Error Box ===== */
+#error-box{
+  position:fixed;inset:0;display:none;flex-direction:column;
+  align-items:center;justify-content:center;gap:16px;
+  z-index:8500;background:var(--bg);padding:30px;text-align:center;
+}
+.error-icon{font-size:36px;margin-bottom:4px}
+#error-box h3{
+  font-family:var(--ff-head);
+  color:var(--coral);font-size:18px;font-weight:700;letter-spacing:0.03em;
+}
+#error-box p{color:var(--muted);font-size:13px;max-width:340px;line-height:1.7}
+#err-reload{
+  padding:11px 28px;
+  background:linear-gradient(135deg,var(--teal),var(--teal2));
+  color:#000;border:none;border-radius:10px;
+  font-family:var(--ff-head);
+  cursor:pointer;font-size:13px;font-weight:700;letter-spacing:0.05em;
+  box-shadow:0 4px 16px rgba(0,212,200,0.3);
+  transition:transform 0.15s,box-shadow 0.15s;
+}
+#err-reload:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,212,200,0.45)}
+
+/* ===== Player ===== */
+#player-wrap{
+  position:fixed;inset:0;display:none;
+  align-items:center;justify-content:center;
+  background:#000;z-index:700;
+}
+#main-video{
+  width:100%;height:100%;object-fit:contain;background:#000;outline:none;
+}
+@media(orientation:portrait) and (max-width:768px){
+  #main-video{object-fit:cover}
+}
+
+/* ===== Progress Bar ===== */
+#prog-wrap{
+  position:fixed;bottom:0;left:0;right:0;
+  height:3px;background:rgba(255,255,255,0.05);
+  z-index:9600;cursor:pointer;display:none;
+  transition:height 0.2s;
+}
+#prog-wrap:hover{height:5px}
+#prog-bar{
+  height:100%;
+  background:linear-gradient(90deg,var(--teal),var(--coral));
+  width:0;transition:width 0.2s linear;
+  position:relative;
+}
+#prog-bar::after{
+  content:'';position:absolute;right:0;top:50%;transform:translateY(-50%);
+  width:10px;height:10px;border-radius:50%;
+  background:#fff;box-shadow:0 0 8px var(--teal);
+  opacity:0;transition:opacity 0.2s;
+}
+#prog-wrap:hover #prog-bar::after{opacity:1}
+
+/* ===== Control Bar ===== */
+#ctrl-bar{
+  position:fixed;bottom:22px;left:50%;transform:translateX(-50%);
+  display:none;align-items:center;gap:4px;
+  background:rgba(10,10,22,0.75);
+  border:1px solid rgba(255,255,255,0.1);
+  backdrop-filter:blur(20px) saturate(1.5);
+  -webkit-backdrop-filter:blur(20px) saturate(1.5);
+  padding:8px 14px;border-radius:999px;
+  z-index:9500;white-space:nowrap;
+  box-shadow:0 8px 32px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.03),
+             inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+.cbtn{
+  background:transparent;border:none;cursor:pointer;
+  color:rgba(255,255,255,0.65);
+  font-size:15px;
+  width:34px;height:34px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:8px;line-height:1;
+  transition:color 0.15s,background 0.15s,transform 0.1s;
+  -webkit-tap-highlight-color:transparent;
+}
+.cbtn:hover{color:#fff;background:rgba(255,255,255,0.1)}
+.cbtn:active{transform:scale(0.88)}
+.cbtn.active{color:var(--teal)}
+
+/* Play button — slightly larger */
+#b-play{
+  width:38px;height:38px;border-radius:10px;
+  background:rgba(0,212,200,0.1);
+  border:1px solid rgba(0,212,200,0.2);
+  color:var(--teal);font-size:16px;
+}
+#b-play:hover{background:rgba(0,212,200,0.18);color:var(--teal)}
+
+/* Volume slider */
+#vol-sl{
+  -webkit-appearance:none;appearance:none;
+  width:68px;height:3px;border-radius:2px;
+  background:rgba(255,255,255,0.18);
+  outline:none;cursor:pointer;vertical-align:middle;
+}
+#vol-sl::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:12px;height:12px;border-radius:50%;
+  background:var(--teal);
+  box-shadow:0 0 6px rgba(0,212,200,0.6);
+  transition:transform 0.1s;
+}
+#vol-sl::-webkit-slider-thumb:hover{transform:scale(1.3)}
+
+.sep{width:1px;height:18px;background:rgba(255,255,255,0.1);display:inline-block;vertical-align:middle;margin:0 3px}
+
+/* ===== Playlist ===== */
+#playlist{
+  position:fixed;top:0;right:0;
+  width:270px;height:100%;
+  background:rgba(10,10,20,0.9);
+  backdrop-filter:blur(30px) saturate(1.5);
+  -webkit-backdrop-filter:blur(30px) saturate(1.5);
+  border-left:1px solid rgba(255,255,255,0.07);
+  z-index:9100;display:none;flex-direction:column;
+  transform:translateX(100%);
+  transition:transform 0.36s cubic-bezier(0.4,0,0.2,1);
+  box-shadow:-20px 0 60px rgba(0,0,0,0.4);
+}
+@media(max-width:400px){#playlist{width:88%}}
+#playlist.open{transform:translateX(0)}
+
+#pl-hdr{
+  padding:18px 16px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  display:flex;align-items:center;justify-content:space-between;
+}
+#pl-hdr span{
+  font-family:var(--ff-head);
+  color:var(--text);font-size:14px;font-weight:700;letter-spacing:0.04em;
+  text-transform:uppercase;
+}
+#pl-count{
+  font-size:10px;font-weight:400;letter-spacing:0.05em;
+  color:var(--teal);margin-left:6px;
+}
+
+#pl-body{flex:1;overflow-y:auto;padding:6px 0}
+
+.pi{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 16px;cursor:pointer;
+  border-bottom:1px solid rgba(255,255,255,0.03);
+  transition:background 0.15s,padding-left 0.2s;
+  position:relative;
+}
+.pi:hover{background:rgba(255,255,255,0.05);padding-left:20px}
+.pi.act{
+  background:rgba(0,212,200,0.07);
+}
+.pi.act::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:2px;
+  background:linear-gradient(180deg,var(--teal),var(--coral));
+}
+
+.pi-n{
+  flex-shrink:0;width:28px;height:28px;border-radius:8px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.06);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;color:var(--muted);
+  font-family:var(--ff-head);font-weight:600;
+  transition:background 0.15s,color 0.15s;
+}
+.pi.act .pi-n{background:rgba(0,212,200,0.15);color:var(--teal);border-color:rgba(0,212,200,0.2)}
+
+.pi-nm{
+  font-size:12.5px;color:var(--text);line-height:1.45;
+  overflow:hidden;display:-webkit-box;
+  -webkit-line-clamp:2;-webkit-box-orient:vertical;
+  font-family:var(--ff-body);
+}
+.pi.act .pi-nm{color:#fff}
+.pi-sz{font-size:10px;color:var(--muted);margin-top:3px;font-variant-numeric:tabular-nums}
+
+/* === 动画 === */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{
+  from{opacity:0;transform:translateY(30px) scale(0.96)}
+  to{opacity:1;transform:none}
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- 年龄验证 -->
+<div id="age-modal">
+  <div class="modal-box">
+    <div class="modal-icon">🔞</div>
+    <div class="modal-badge">⚠ 内容警告</div>
+    <h2>年龄验证</h2>
+    <p class="sub">
+      本网站含有仅适合 <strong>18岁及以上</strong> 成年人的内容。<br>
+      继续访问即表示您确认已达法定年龄，<br>并同意相关服务条款与法律法规。
+    </p>
+    <div class="modal-actions">
+      <button class="btn btn-yes" id="yes-btn">✓ 我已满18岁</button>
+      <button class="btn btn-no"  id="no-btn">✕ 未满18岁</button>
+    </div>
+    <div class="modal-note">根据《网络安全法》等相关法律法规要求</div>
+  </div>
+</div>
+
+<!-- 加载中 -->
+<div id="loader">
+  <div class="loader-inner">
+    <div class="ring-wrap">
+      <div class="ring ring-outer"></div>
+      <div class="ring"></div>
+      <div class="ring-dot"></div>
+    </div>
+    <div id="loader-txt">正在读取 GitHub Release…</div>
+  </div>
+</div>
+
+<!-- 错误提示 -->
+<div id="error-box">
+  <div class="error-icon">⚠</div>
+  <h3>加载失败</h3>
+  <p id="err-msg">无法获取视频列表，请检查仓库配置。</p>
+  <button id="err-reload">重新加载</button>
+</div>
+
+<!-- 播放区 -->
+<div id="player-wrap">
+  <video id="main-video" autoplay playsinline webkit-playsinline preload="auto" muted></video>
+</div>
+
+<!-- 进度条 -->
+<div id="prog-wrap"><div id="prog-bar"></div></div>
+
+<!-- 控制栏 -->
+<div id="ctrl-bar">
+  <button class="cbtn" id="b-prev" title="上一个">⏮</button>
+  <button class="cbtn" id="b-play" title="播放/暂停">⏸</button>
+  <button class="cbtn" id="b-next" title="下一个">⏭</button>
+  <span class="sep"></span>
+  <button class="cbtn" id="b-mute" title="静音">🔊</button>
+  <input type="range" id="vol-sl" min="0" max="1" step="0.02" value="1"/>
+  <span class="sep"></span>
+  <button class="cbtn" id="b-list" title="播放列表">☰</button>
+  <button class="cbtn" id="b-fs"   title="全屏">⛶</button>
+</div>
+
+<!-- 播放列表 -->
+<div id="playlist">
+  <div id="pl-hdr">
+    <span>📁 视频列表<span id="pl-count"></span></span>
+    <button class="cbtn" id="b-cls" style="font-size:12px">✕</button>
+  </div>
+  <div id="pl-body"></div>
+</div>
+
+<script>
+/* ============================================================
+   ★ 配置区 — 只改这里
+   ============================================================ */
+var playlist = [
+    {
+        name: "25.mp4",
+        url: "./25.mp4",
+        size: ""
+    }
+];
+
+var curIdx = 0;
+/* ============================================================ */
+
+
+function gid(id){ return document.getElementById(id); }
+function show(id,flex){ gid(id).style.display = flex ? 'flex' : 'block'; }
+function hide(id){ gid(id).style.display = 'none'; }
+function fmtSize(b){
+  if(!b) return '';
+  if(b < 1048576)    return (b/1024).toFixed(1) + ' KB';
+  if(b < 1073741824) return (b/1048576).toFixed(1) + ' MB';
+  return (b/1073741824).toFixed(2) + ' GB';
+}
+
+/* 安全关闭 */
+function secureClose(){
+  document.documentElement.style.opacity = '0';
+  document.body.style.pointerEvents = 'none';
+  setTimeout(function(){
+    try{
+      if(window.history.length <= 1){ window.close(); }
+      else { window.open('','_self').close(); }
+      setTimeout(function(){
+        if(!window.closed){
+          if(/iPad|iPhone|iPod/.test(navigator.userAgent)){
+            document.body.innerHTML = '<p style="color:#fff;text-align:center;padding:50px;font-size:16px">请手动关闭本页面</p>';
+          } else {
+            window.location.replace('about:blank');
+          }
+        }
+      }, 150);
+    } catch(e){ window.location.href = 'about:blank'; }
+  }, 280);
+}
+
+/* ===== 粒子背景（带连线效果） ===== */
+(function(){
+  var c   = gid('bg-canvas');
+  var ctx = c.getContext('2d');
+
+  function resize(){
+    c.width  = window.innerWidth;
+    c.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  var N = 65;
+  var pts = [];
+  for(var i = 0; i < N; i++){
+    pts.push({
+      x:  Math.random() * window.innerWidth,
+      y:  Math.random() * window.innerHeight,
+      r:  Math.random() * 1.2 + 0.3,
+      vx: (Math.random() - 0.5) * 0.22,
+      vy: (Math.random() - 0.5) * 0.22
+    });
+  }
+
+  var LINK_DIST = 110;
+
+  function loop(){
+    ctx.clearRect(0, 0, c.width, c.height);
+
+    for(var i = 0; i < pts.length; i++){
+      var p = pts[i];
+      p.x += p.vx; p.y += p.vy;
+      if(p.x < 0) p.x = c.width;
+      if(p.x > c.width) p.x = 0;
+      if(p.y < 0) p.y = c.height;
+      if(p.y > c.height) p.y = 0;
+    }
+
+    /* Draw lines */
+    for(var i = 0; i < pts.length; i++){
+      for(var j = i+1; j < pts.length; j++){
+        var dx = pts[i].x - pts[j].x;
+        var dy = pts[i].y - pts[j].y;
+        var d  = Math.sqrt(dx*dx + dy*dy);
+        if(d < LINK_DIST){
+          var a = (1 - d / LINK_DIST) * 0.14;
+          ctx.beginPath();
+          ctx.moveTo(pts[i].x, pts[i].y);
+          ctx.lineTo(pts[j].x, pts[j].y);
+          ctx.strokeStyle = 'rgba(0,212,200,' + a + ')';
+          ctx.lineWidth = 0.6;
+          ctx.stroke();
+        }
+      }
+    }
+
+    /* Draw dots */
+    for(var i = 0; i < pts.length; i++){
+      var p = pts[i];
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,212,200,0.5)';
+      ctx.fill();
+    }
+
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+
+
+/* 渲染播放列表 */
+function renderList(){
+  var body = gid('pl-body');
+  body.innerHTML = '';
+
+  var countEl = gid('pl-count');
+  if(countEl) countEl.textContent = ' (' + playlist.length + ')';
+
+  for(var i = 0; i < playlist.length; i++){
+    (function(idx){
+      var v   = playlist[idx];
+      var div = document.createElement('div');
+      div.className = 'pi' + (idx === curIdx ? ' act' : '');
+      div.innerHTML =
+        '<div class="pi-n">' + (idx + 1) + '</div>' +
+        '<div><div class="pi-nm">' + v.name + '</div>' +
+        '<div class="pi-sz">' + v.size + '</div></div>';
+      div.addEventListener('click', function(){ loadVideo(idx); });
+      body.appendChild(div);
+    })(i);
+  }
+}
+
+/* 加载视频 */
+function loadVideo(idx){
+  curIdx = ((idx % playlist.length) + playlist.length) % playlist.length;
+  var video = gid('main-video');
+  video.src = playlist[curIdx].url;
+  video.load();
+
+  video.muted = true;
+  var playPromise = video.play();
+  if(playPromise && typeof playPromise.then === 'function'){
+    playPromise.then(function(){
+      video.muted  = false;
+      video.volume = 1;
+      gid('b-mute').textContent = '🔊';
+      gid('vol-sl').value = 1;
+    }).catch(function(){
+      video.muted = true;
+      gid('b-mute').textContent = '🔇';
+    });
+  }
+
+  gid('b-play').textContent = '⏸';
+  renderList();
+
+  var items = document.querySelectorAll('.pi');
+  if(items[curIdx]){
+    items[curIdx].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+/* 启动 */
+function startPlayback(){
+
+    show('player-wrap', true);
+    show('ctrl-bar', true);
+    show('prog-wrap');
+    show('playlist', true);
+
+    renderList();
+    loadVideo(0);
+
+    initControls();
+}
+
+/* 控制栏 */
+function initControls(){
+  var video    = gid('main-video');
+  var progBar  = gid('prog-bar');
+  var progWrap = gid('prog-wrap');
+
+  video.addEventListener('timeupdate', function(){
+    if(video.duration){
+      progBar.style.width = (video.currentTime / video.duration * 100) + '%';
+    }
+  });
+
+  progWrap.addEventListener('click', function(e){
+    if(!video.duration) return;
+    video.currentTime = (e.offsetX / progWrap.offsetWidth) * video.duration;
+  });
+
+  video.addEventListener('ended', function(){ loadVideo(curIdx + 1); });
+
+  gid('b-play').addEventListener('click', function(){
+    if(video.paused){
+      video.play();
+      gid('b-play').textContent = '⏸';
+    } else {
+      video.pause();
+      gid('b-play').textContent = '▶';
+    }
+  });
+
+  gid('b-prev').addEventListener('click', function(){ loadVideo(curIdx - 1); });
+  gid('b-next').addEventListener('click', function(){ loadVideo(curIdx + 1); });
+
+  gid('b-mute').addEventListener('click', function(){
+    video.muted = !video.muted;
+    gid('b-mute').textContent = video.muted ? '🔇' : '🔊';
+  });
+
+  var volSl = gid('vol-sl');
+  volSl.addEventListener('input', function(){
+    video.volume = parseFloat(this.value);
+    video.muted  = (this.value == 0);
+    gid('b-mute').textContent = video.muted ? '🔇' : '🔊';
+  });
+
+  gid('b-fs').addEventListener('click', function(){
+    var el  = gid('player-wrap');
+    var req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen;
+    var ex  = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen;
+    if(!document.fullscreenElement && !document.webkitFullscreenElement){
+      if(req) req.call(el);
+    } else {
+      if(ex) ex.call(document);
+    }
+  });
+
+  gid('b-list').addEventListener('click', function(){
+    gid('playlist').classList.toggle('open');
+  });
+  gid('b-cls').addEventListener('click', function(){
+    gid('playlist').classList.remove('open');
+  });
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === ' ' && e.target.tagName !== 'INPUT'){
+      e.preventDefault();
+      if(video.paused){ video.play();  gid('b-play').textContent = '⏸'; }
+      else            { video.pause(); gid('b-play').textContent = '▶'; }
+    }
+    if(e.key === 'ArrowRight') loadVideo(curIdx + 1);
+    if(e.key === 'ArrowLeft')  loadVideo(curIdx - 1);
+  });
+
+  window.addEventListener('orientationchange', function(){
+    setTimeout(function(){
+      var angle = screen.orientation ? screen.orientation.angle : window.orientation;
+      video.style.objectFit = (angle % 180 !== 0) ? 'cover' : 'contain';
+    }, 300);
+  });
+}
+
+/* 入口 */
+document.addEventListener('DOMContentLoaded', function(){
+  gid('yes-btn').addEventListener('click', function(){
+    var modal = gid('age-modal');
+    modal.style.transition = 'opacity 0.35s';
+    modal.style.opacity    = '0';
+    setTimeout(function(){ hide('age-modal'); startPlayback(); }, 350);
+  });
+
+  gid('no-btn').addEventListener('click', function(){
+    alert('根据相关法律法规，未满18岁用户无法访问此内容。');
+    secureClose();
+  });
+
+  gid('err-reload').addEventListener('click', function(){ location.reload(); });
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') secureClose();
+  });
+});
+</script>
+</body>
+</html>
